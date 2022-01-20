@@ -23,7 +23,12 @@ export default function SignIn() {
       }
       
    };
-
+    // SignInWithProvider returns promises thats y we use async here
+    // inside this fun I write the logic of try and catch if there is error catch will get it 
+    // inside try we use auth variable defined in firebase.js which is a variable of firebase to access the fun of it
+    // we use fun signInWithPopup which take provider as a argument and returns object which we divided into
+    // additionalUserInfo and user
+    // if user is new then we set the details inside our database using database variable again a firebase variable
 
    const onFacebookSignIn =()=>{
     SignInWithProvider( new firebase.auth.FacebookAuthProvider());
@@ -59,3 +64,6 @@ export default function SignIn() {
         </Container>
     )
 }
+
+// we have used Conatiner,Grid,Row ,Col, Panel from Rsuite here 
+// and used classes defined in scss files
