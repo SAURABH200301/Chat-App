@@ -19,6 +19,7 @@ export const ProfileProvider = ({ children }) => {
                  
                 UserRef=database.ref(`/profile/${authObj.uid}`);
                 // when any data will be changed this on function will be called which will call, callBack function
+                // this is real listener get run when anything is changed in database like we change our nickname it get updated
                 UserRef.on('value',(snap)=>{
                       const {name, createdAt} = snap.val();
 
