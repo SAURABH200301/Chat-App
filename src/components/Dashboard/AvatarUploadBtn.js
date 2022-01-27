@@ -5,6 +5,7 @@ import ProfileAvatar from '../ProfileAvatar';
 import { useProfile } from '../../context/profile.context';
 import { useModalState } from '../../misc/custom-hooks';
 import { database, storage } from '../../misc/firebase';
+import { GetUserUpdates } from '../../misc/helper';
 
 
 
@@ -56,6 +57,7 @@ export default function AvatarUploadBtn() {
         setIsLoading(true);
         try {
             const blob = await getBlob(canvas);
+
             const avatarFileRef = storage.ref(`/profile/${profile.uid}`).child('avatar');
             const uploadAvatarResult = await avatarFileRef.put(blob, {
                 cacheControl: `public,max-age=${3600 * 24 * 3}`
@@ -63,14 +65,19 @@ export default function AvatarUploadBtn() {
 
             const downloadURL = await uploadAvatarResult.ref.getDownloadURL();
 
-            const userAvatarUrl = database.ref(`/profile/${profile.uid}`).child('avatar');
+            // const userAvatarUrl = database.ref(`/profile/${profile.uid}`).child('avatar');
 
-            await userAvatarUrl.set(downloadURL);
+            const updates = await GetUserUpdates(profile.uid, 'avatar', downloadURL, database);
+
+            await database.ref().update(updates);
+            // await userAvatarUrl.set(downloadURL);
 
             setIsLoading(false);
             Alert.info('Avatar has been Uploaded', 4000);
         } catch (err) {
             setIsLoading(false);
+            // eslint-disable-next-line no-console
+            console.log(err.message);
             Alert.warning(err.message, 4000);
         }
 
