@@ -8,6 +8,7 @@ export default function EditableInput({
     label = null,
     placeholder = "Write Your Value",
     emptyMsg = "Input is Empty",
+    wrapperClassName="",
     ...inputProps
 }) {
 
@@ -38,7 +39,7 @@ export default function EditableInput({
     }
 
     return (
-        <div>
+        <div className={wrapperClassName}>
             {label}
             <InputGroup>
             <Input 

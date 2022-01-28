@@ -67,10 +67,6 @@ export default function Bottom() {
      onSendClick();}
   }
 
-  const currentHeight = window.innerHeight;
-  // eslint-disable-next-line no-console
-  console.log(currentHeight);
-
   return <div>
     <InputGroup>
       <Input 
