@@ -17,7 +17,7 @@ export default function Chat() {
         <Loader center vertical size="md" content="Loading" speed='slow'/>
     }
 
-    const currentRoom = rooms.find(room=> room.Id === chatId);
+    const currentRoom = rooms.find(room => room.Id === chatId);
 
     if(!currentRoom){
         return <h6 className='text-center mt-page'> Chat {chatId} not found</h6>
@@ -29,14 +29,18 @@ export default function Chat() {
         name,
         description
     }
+
+    
+
   return <CurrentRoomProvide data={currentRoomData}>
+    
       <div className='chat-top'>
          <Top/>
        </div>
        <div className='chat-middle'>
          <Messages/>
        </div>
-       <div className='chat-middle'>
+       <div className='chat-bottom'>
          <Bottom/>
        </div>
   </CurrentRoomProvide>;

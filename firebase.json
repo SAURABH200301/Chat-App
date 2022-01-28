@@ -1,28 +1,19 @@
 {
-  "rules": {
-    "profile":{
-      "$user_id":{
-        ".read": "$user_id === auth.uid",
-        ".write": "$user_id=== auth.uid"
+  "database": {
+    "rules": "database.rules.json"
+  },
+  "hosting": {
+    "public": "build",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
       }
-    },
-    "rooms":{
-      ".read": "auth!==null",
-      ".write": "auth!==null",
-      "$room_id":{
-        ".read": "auth!==null",
-        ".write": "auth!==null"
-      }
-    },
-      "messages":{
-      ".read": "auth!==null",
-      ".write": "auth!==null",
-      "$mesage_id":{
-        ".read": "auth!==null",
-        ".write": "auth!==null"
-      }
-    },
-    ".read": false,
-    ".write": false
-  } 
+    ]
+  }
 }

@@ -4,10 +4,11 @@ import { createContext ,useContextSelector} from "use-context-selector";
 
 const CurrentRoomContext = createContext()
 
+
 export const CurrentRoomProvide =({children, data})=>(
-   <CurrentRoomContext.Provider value={data}>
+      <CurrentRoomContext.Provider value={data}>
          {children}
-    </CurrentRoomContext.Provider>
+      </CurrentRoomContext.Provider>
      )
 
 export const useCurrentRoom =(selector)=> useContextSelector(CurrentRoomContext,selector );

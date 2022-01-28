@@ -67,10 +67,14 @@ export default function Bottom() {
      onSendClick();}
   }
 
+  const currentHeight = window.innerHeight;
+  // eslint-disable-next-line no-console
+  console.log(currentHeight);
+
   return <div>
     <InputGroup>
       <Input 
-         placeholder="Write a new mwassage here..." 
+         placeholder="Write a new message here..." 
          value={input} 
          onChange={onInputChange} 
          onKeyDown={onKeyDown}
