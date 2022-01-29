@@ -55,8 +55,6 @@ export default function Bottom() {
          setIsLoading(false);
      } catch (err) {
        Alert.error(err.message,4000);
-       // eslint-disable-next-line no-console
-       console.log(err.message);
        setIsLoading(false);
      }
   }

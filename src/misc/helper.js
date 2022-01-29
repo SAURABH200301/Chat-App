@@ -10,9 +10,18 @@ export function getIntialName(name) {
     return SpiltName[0][0];
 }
 
-export function TransformToArrWithId(snapVal) {
-    return snapVal?  Object.keys(snapVal).map(roomId=>({...snapVal[roomId], Id:roomId})) :[];
+export function TransformToArr(snapVal){
+    return snapVal? Object.keys(snapVal) : [];
 }
+
+export function TransformToArrWithId(snapVal) {
+    return snapVal
+      // eslint-disable-next-line arrow-body-style
+      ? Object.keys(snapVal).map(roomId => {
+          return { ...snapVal[roomId], id: roomId };
+        })
+      : [];
+  }
 
 export async function GetUserUpdates(userId , keyToUpdate, value, db) {
    const updates={}

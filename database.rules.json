@@ -8,15 +8,18 @@
     },
     "rooms":{
       ".read": "auth!==null",
-      ".write": "auth!==null",
       "$room_id":{
         ".read": "auth!==null",
-        ".write": "auth!==null"
+        ".write": "!data.exists() || data.child('admin').child(auth.uid).val() == true",
+        "lastMessage":{
+          ".write": "auth!==null"
+        } 
       }
     },
       "messages":{
       ".read": "auth!==null",
       ".write": "auth!==null",
+      ".indexOn": "roomId",
       "$mesage_id":{
         ".read": "auth!==null",
         ".write": "auth!==null"
