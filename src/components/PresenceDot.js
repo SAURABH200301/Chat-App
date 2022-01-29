@@ -32,8 +32,6 @@ const getColor = presence => {
   const PresenceDot = ({ uid }) => {
     const presence = usePresence(uid);
   
-      console.log('uid',uid)
-      console.log(presence)
     return (
       <Whisper
         placement="top"
