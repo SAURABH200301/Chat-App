@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useCallback } from 'react/cjs/react.development';
 import { Alert } from 'rsuite';
-import { database, auth } from '../../../misc/firebase';
+import { database, auth, storage } from '../../../misc/firebase';
 import { TransformToArrWithId } from '../../../misc/helper';
 import MessageItem from './MessageItem';
 
@@ -80,7 +80,7 @@ export default function Messages() {
     Alert.info(alertMsg,4000);
   },[])
 
-  const handleDelete=useCallback(async(msgId)=>{
+  const handleDelete=useCallback(async(msgId,file)=>{
       
       // eslint-disable-next-line no-alert
       if(!window.confirm('Delete this message')){
@@ -108,7 +108,18 @@ export default function Messages() {
         await database.ref().update(updates)
          Alert.info('message has been deleted',4000);
       } catch (err) {
-        Alert.error(err.message,4000);
+        // eslint-disable-next-line consistent-return
+        return Alert.error(err.message,4000);
+      }
+
+      if(file){
+
+        try {
+             const fileRef = storage.refFromURL(file.url);
+             await fileRef.delete();
+        } catch (err) {
+            Alert.error(err.message,4000);
+        }
       }
 
   },[chatId, message])
