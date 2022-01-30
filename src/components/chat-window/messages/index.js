@@ -1,6 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState,useCallback  } from 'react';
 import { useParams } from 'react-router-dom';
-import { useCallback } from 'react/cjs/react.development';
 import { Alert, Button } from 'rsuite';
 import { database, auth, storage } from '../../../misc/firebase';
 import groupBy, { TransformToArrWithId } from '../../../misc/helper';
