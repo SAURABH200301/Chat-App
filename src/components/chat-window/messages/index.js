@@ -1,156 +1,223 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useCallback } from 'react/cjs/react.development';
-import { Alert } from 'rsuite';
+import { Alert, Button } from 'rsuite';
 import { database, auth, storage } from '../../../misc/firebase';
 import groupBy, { TransformToArrWithId } from '../../../misc/helper';
 import MessageItem from './MessageItem';
 
-export default function Messages() {
+const PAGE_SIZE = 15;
+const messagesRef = database.ref('/messages');
 
-  const {chatId} = useParams();
-  const [message, setMessage] =useState(null);
+function shouldScrollToBottom(node, threshold = 30) {
+  const percentage =
+    (100 * node.scrollTop) / (node.scrollHeight - node.clientHeight) || 0;
 
-  const isChatEmpty = message && message.length===0;
-  const canShowMessages = message && message.length>0;
+  return percentage > threshold;
+}
 
-  useEffect(()=>{
-    const messagesRef = database.ref('/messages');
-    messagesRef.orderByChild('roomId').equalTo(chatId).on('value',(snap)=>{
-       const data= TransformToArrWithId(snap.val());
+const Messages = () => {
+  const { chatId } = useParams();
+  const [messages, setMessages] = useState(null);
+  const [limit, setLimit] = useState(PAGE_SIZE);
+  const selfRef = useRef();
 
-       setMessage(data);
-    })
+  const isChatEmpty = messages && messages.length === 0;
+  const canShowMessages = messages && messages.length > 0;
 
-    return ()=>{
+  const loadMessages = useCallback(
+    limitToLast => {
+      const node = selfRef.current;
+
+      messagesRef.off();
+
+      messagesRef
+        .orderByChild('roomId')
+        .equalTo(chatId)
+        .limitToLast(limitToLast || PAGE_SIZE)
+        .on('value', snap => {
+          const data = TransformToArrWithId(snap.val());
+          setMessages(data);
+
+          if (shouldScrollToBottom(node)) {
+            node.scrollTop = node.scrollHeight;
+          }
+        });
+
+      setLimit(p => p + PAGE_SIZE);
+    },
+    [chatId]
+  );
+
+  const onLoadMore = useCallback(() => {
+    const node = selfRef.current;
+    const oldHeight = node.scrollHeight;
+
+    loadMessages(limit);
+
+    setTimeout(() => {
+      const newHeight = node.scrollHeight;
+      node.scrollTop = newHeight - oldHeight;
+    }, 500);
+  }, [loadMessages, limit]);
+
+  useEffect(() => {
+    const node = selfRef.current;
+
+    loadMessages();
+
+    setTimeout(() => {
+      node.scrollTop = node.scrollHeight;
+    }, 500);
+
+    return () => {
       messagesRef.off('value');
-    }
+    };
+  }, [loadMessages]);
 
-  },[chatId])
-  
-  const handleAdmin = useCallback(async(uid)=>{
-      const adminRef = database.ref(`/rooms/${chatId}/admin`);
-    
+  const handleAdmin = useCallback(
+    async uid => {
+      const adminsRef = database.ref(`/rooms/${chatId}/admins`);
+
       let alertMsg;
 
-      await adminRef.transaction(admins =>{
-
+      await adminsRef.transaction(admins => {
         if (admins) {
           if (admins[uid]) {
             admins[uid] = null;
-            alertMsg = "Admin Permission Removed";
+            alertMsg = 'Admin permission removed';
           } else {
             admins[uid] = true;
-            alertMsg = "Admin Permission Grant";
+            alertMsg = 'Admin permission granted';
           }
         }
+
         return admins;
-      })
-      Alert.info(alertMsg,4000);
-  },[chatId])
+      });
 
-  // to handle likes for msgs
+      Alert.info(alertMsg, 4000);
+    },
+    [chatId]
+  );
 
-  const handleLike=useCallback( async(msgId)=>{
-    const {uid} = auth.currentUser;
-    const messagesRef = database.ref(`/messages/${msgId}`);
-    
+  const handleLike = useCallback(async msgId => {
+    const { uid } = auth.currentUser;
+    const messageRef = database.ref(`/messages/${msgId}`);
+
     let alertMsg;
 
-    await messagesRef.transaction(msg =>{
-
+    await messageRef.transaction(msg => {
       if (msg) {
         if (msg.likes && msg.likes[uid]) {
-          msg.likeCount-=1;
+          msg.likeCount -= 1;
           msg.likes[uid] = null;
-          alertMsg = "Like Removed";
+          alertMsg = 'Like removed';
         } else {
-           // below if condition check for like
-           
-          if(!msg.likes){
-            msg.likes ={};
+          msg.likeCount += 1;
+
+          if (!msg.likes) {
+            msg.likes = {};
           }
-          msg.likeCount+=1;
+
           msg.likes[uid] = true;
-          alertMsg = "Liked";
+          alertMsg = 'Like added';
         }
       }
-      return msg;
-    })
-    Alert.info(alertMsg,4000);
-  },[])
 
-  const handleDelete=useCallback(async(msgId,file)=>{
-      
+      return msg;
+    });
+
+    Alert.info(alertMsg, 4000);
+  }, []);
+
+  const handleDelete = useCallback(
+    async (msgId, file) => {
       // eslint-disable-next-line no-alert
-      if(!window.confirm('Delete this message')){
+      if (!window.confirm('Delete this message?')) {
         return;
       }
 
-      const isLast = message[message.length-1].id === msgId;
-      const updates ={};
-      updates[`/messages/${msgId}`]= null;
+      const isLast = messages[messages.length - 1].id === msgId;
 
-      // if msg is last and having atleast 2 msgs
-      if(isLast && message.length>1){
+      const updates = {};
+
+      updates[`/messages/${msgId}`] = null;
+
+      if (isLast && messages.length > 1) {
         updates[`/rooms/${chatId}/lastMessage`] = {
-            ...message[message.length-2],
-            msgId: message[message.length - 2].id
-        }
+          ...messages[messages.length - 2],
+          msgId: messages[messages.length - 2].id,
+        };
       }
-        // if msg is last and no other msg is there is chat
-      if(isLast && message.length === 1){
-        updates[`/rooms/${chatId}/lastMessage`]= null;
+
+      if (isLast && messages.length === 1) {
+        updates[`/rooms/${chatId}/lastMessage`] = null;
       }
 
       try {
-        
-        await database.ref().update(updates)
-         Alert.info('message has been deleted',4000);
+        await database.ref().update(updates);
+
+        Alert.info('Message has been deleted');
       } catch (err) {
         // eslint-disable-next-line consistent-return
-        return Alert.error(err.message,4000);
+        return Alert.error(err.message);
       }
 
-      if(file){
-
+      if (file) {
         try {
-             const fileRef = storage.refFromURL(file.url);
-             await fileRef.delete();
+          const fileRef = storage.refFromURL(file.url);
+          await fileRef.delete();
         } catch (err) {
-            Alert.error(err.message,4000);
+          Alert.error(err.message);
         }
       }
+    },
+    [chatId, messages]
+  );
 
-  },[chatId, message])
+  const renderMessages = () => {
+    const groups = groupBy(messages, item =>
+      new Date(item.createdAt).toDateString()
+    );
 
-  const renderMessages=()=>{
-    const groups = groupBy(message,item =>new Date(item.createdAt).toDateString());
-    
-    const items =[];
+    const items = [];
 
-    Object.keys(groups).forEach(date=>{
+    Object.keys(groups).forEach(date => {
+      items.push(
+        <li key={date} className="text-center mb-1 padded">
+          {date}
+        </li>
+      );
 
-      items.push(<li key={date} className='text-center mb-1 padded'>{date}</li>);
-       
-      const msgs =groups[date].map(msg =>( 
-
-        <MessageItem 
-          key={msg.id} 
-          message={msg} 
-          handleAdmin={handleAdmin} 
-          handleLike={handleLike} 
+      const msgs = groups[date].map(msg => (
+        <MessageItem
+          key={msg.id}
+          message={msg}
+          handleAdmin={handleAdmin}
+          handleLike={handleLike}
           handleDelete={handleDelete}
-          />
-      ))
+        />
+      ));
 
       items.push(...msgs);
-    })
-  return items;
-}
+    });
 
-  return <ul className='msg-list custom-scroll'>
-      {isChatEmpty && <li>No Message Yet</li>}
+    return items;
+  };
+
+  return (
+    <ul ref={selfRef} className="msg-list custom-scroll">
+      {messages && messages.length >= PAGE_SIZE && (
+        <li className="text-center mt-2 mb-2">
+          <Button onClick={onLoadMore} color="green">
+            Load more
+          </Button>
+        </li>
+      )}
+      {isChatEmpty && <li>No messages yet</li>}
       {canShowMessages && renderMessages()}
-      </ul>
-}
+    </ul>
+  );
+};
+
+export default Messages;
