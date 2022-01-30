@@ -1,5 +1,4 @@
-import React from 'react'
-import { useState, useCallback } from 'react/cjs/react.development'
+import React,{ useState, useCallback } from 'react'
 import { Alert, Icon, Input, InputGroup } from 'rsuite'
 
 export default function EditableInput({
@@ -11,7 +10,6 @@ export default function EditableInput({
     wrapperClassName="",
     ...inputProps
 }) {
-
     const [input, setInput] = useState(initialInput);
     const [isEditable, setIsEditable] = useState(false);
 
@@ -36,7 +34,7 @@ export default function EditableInput({
           await onSave(trimmed);
       }
       setIsEditable(false);
-    }
+    };
 
     return (
         <div className={wrapperClassName}>
@@ -59,7 +57,7 @@ export default function EditableInput({
             }
             </InputGroup>
         </div>
-    )
-}
+    );
+};
 
 // this function changes the nickname of the user 
