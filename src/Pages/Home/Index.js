@@ -34,8 +34,8 @@ export default function Home() {
                         </Route>
                         <Route>
                             {isDesktop && 
-                            <Col xs={24} md={16} className='h-100'>
-                               <h6 className='text-center mt-page'>Please Select Chat</h6>
+                            <Col xs={24} md={16} className='h-100 bg-img'>
+                               <h6 className='text-center mt-page text-white font-zen'>Please Select Chat</h6>
                             </Col>}
                         </Route>
                     </Switch>

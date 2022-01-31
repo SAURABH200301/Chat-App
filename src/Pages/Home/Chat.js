@@ -39,7 +39,7 @@ export default function Chat() {
 
     
 
-  return <CurrentRoomProvide data={currentRoomData}>
+  return <CurrentRoomProvide data={currentRoomData} >
     
       <div className='chat-top'>
          <Top/>
