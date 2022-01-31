@@ -2,6 +2,7 @@ import React from 'react'
 import firebase from 'firebase/app';
 import { Alert, Button, Col, Container, Grid, Icon, Panel, Row } from 'rsuite'
 import { auth, database } from '../misc/firebase';
+import Modal from '../components/Modal';
 
 export default function SignIn() {
 
@@ -44,10 +45,12 @@ export default function SignIn() {
                 <Row>
                     <Col xs={24} md={12} mdOffset={6}>
                         <Panel>
+                            <Modal>
                             <div className='text-center'>
                                 <h2>Welcome to Chat</h2>
                                 <p>Progressive Chat platform for neophytes</p>
                             </div>
+                            </Modal> 
                             <div className='mt-3'>
                                 <Button block color='blue' onClick={onFacebookSignIn}>
                                    <Icon icon="facebook "/> Continue with Facebook
