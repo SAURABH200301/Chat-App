@@ -8,7 +8,7 @@ export default function RoomItem({room}) {
 
   return <div>
       <div className='d-flex justify-content-between align-items-center'>
-           <h3 className='text-disappear'>{name}</h3>
+           <h3 className='text-disappear font-zen'>{name}</h3>
            <TimeAgo 
              datetime={lastMessage? new Date(lastMessage.createdAt):new Date(createdAt)} 
              className='text-normal text-black-45'

@@ -16,7 +16,7 @@ export default function Sidebar() {
     },[topSidebarRef]);
     return (
         <div className='h-100 pt-2'>
-            
+            <h2 className='mt-1 mb-2 text-center font-comforter'>Join</h2>
           <div>
              <DashboardToggle/>
              <CreateRoomBtnModal/>

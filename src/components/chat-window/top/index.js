@@ -22,7 +22,7 @@ const  Top=()=> {
                size="2x" 
                className={isMobile ? 'd-inline-block p-0 mr-2 text-blue link-unstyled'
                :'d-none'}/>
-               <span className='text-disappear'>
+               <span className='text-disappear font-zen'>
                  {name}
                </span>
              </h4>
