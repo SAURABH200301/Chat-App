@@ -22,6 +22,16 @@ $indent_3: 15px;
   background-size: cover;
   opacity: 0.9;
 }
+
+.bg-img-signin{
+  background-image: url("../../src/images/signin.jpg");
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.border-2px{
+  border: 2px dotted black;
+}
 .opc{
   opacity: 1 !important;
 }

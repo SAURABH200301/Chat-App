@@ -39,11 +39,10 @@ export default function SignIn() {
     SignInWithProvider( new firebase.auth.GoogleAuthProvider());
    };
     return (
-        <Container>
-
-            <Grid className='mt-page'>
+        <Container >
+             <Grid className='mt-page'>
                 <Row>
-                    <Col xs={24} md={12} mdOffset={6}>
+                    <Col xs={24} md={12} mdOffset={6} >
                         <Panel>
                             {/* <Modal> */}
                             <div className='text-center'>
@@ -60,10 +59,12 @@ export default function SignIn() {
                                 </Button>
                             </div>
                         </Panel>
-                    </Col>
-                </Row>
+                     </Col>
+                     {/* <Col  xs={12} md={6} mdOffset={6}>
+                       hey
+                     </Col> */}
+                 </Row>
             </Grid>
-
         </Container>
     )
 }
